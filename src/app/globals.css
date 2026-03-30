@@ -571,6 +571,64 @@ select.input {
 
 /* ── responsive design ── */
 
+/* Landscape orientation mobile */
+@media (max-height: 500px) and (max-width: 768px) {
+  .header {
+    padding: 12px;
+  }
+
+  .header-nav {
+    gap: 4px;
+  }
+
+  .nav-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .main-container {
+    padding: 12px 8px 40px;
+  }
+
+  .stats-row {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .stat-card {
+    padding: 10px 12px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+}
+
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .chevron {
+    transition: none;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .stat-card:hover {
+    transform: none;
+  }
+
+  .job-row:hover {
+    box-shadow: none;
+  }
+}
+
 /* Tablet and below (768px) */
 @media (max-width: 768px) {
   body {
