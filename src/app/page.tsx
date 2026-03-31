@@ -20,6 +20,7 @@ export default function Home() {
     jobs,
     profile,
     loading: dataLoading,
+    error: dataError,
     counts,
     saveProfile,
     addJob,
@@ -92,6 +93,13 @@ export default function Home() {
       />
 
       <div className="main-container">
+        {/* Error display */}
+        {dataError && (
+          <div className="auth-error" style={{ marginBottom: "20px" }}>
+            ⚠️ {dataError}
+          </div>
+        )}
+        
         {/* Stats */}
         <div className="stats-row">
           <StatCard label="Total Applied" value={counts.total} accent="#6366F1" />

@@ -15,6 +15,8 @@ export interface Job {
 
 export type JobInsert = Omit<Job, "id" | "user_id" | "created_at">;
 
+export type JobFormInput = Omit<Job, "id" | "user_id" | "created_at" | "status">;
+
 export interface Profile {
   id: string;
   name: string;

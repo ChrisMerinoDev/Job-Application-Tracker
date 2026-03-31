@@ -10,20 +10,32 @@ export function useAuth() {
   const supabase = createClient();
 
   useEffect(() => {
+    let isMounted = true;
+
     // Get initial session
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-      setLoading(false);
+    supabase.auth.getUser().then(({ data: { user }, error }) => {
+      if (isMounted) {
+        if (error) {
+          console.error("Auth error:", error);
+        }
+        setUser(user ?? null);
+        setLoading(false);
+      }
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      if (isMounted) {
+        setUser(session?.user ?? null);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, [supabase.auth]);
 
   const signUp = useCallback(

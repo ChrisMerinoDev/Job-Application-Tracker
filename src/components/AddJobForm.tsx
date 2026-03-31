@@ -1,16 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { WorkType } from "@/types";
+import { WorkType, JobFormInput } from "@/types";
 import { WORK_TYPES } from "@/lib/constants";
 
 interface AddJobFormProps {
-  onAdd: (job: {
-    company: string;
-    position: string;
-    work_type: WorkType;
-    location: string;
-  }) => void;
+  onAdd: (job: JobFormInput) => Promise<void>;
   onDone: () => void;
 }
 
@@ -19,22 +14,34 @@ export default function AddJobForm({ onAdd, onDone }: AddJobFormProps) {
   const [position, setPosition] = useState("");
   const [workType, setWorkType] = useState<WorkType>("Remote");
   const [location, setLocation] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
-  const canSubmit = company.trim() && position.trim();
+  const canSubmit = company.trim() && position.trim() && !busy;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
-    onAdd({
-      company: company.trim(),
-      position: position.trim(),
-      work_type: workType,
-      location: location.trim(),
-    });
-    setCompany("");
-    setPosition("");
-    setWorkType("Remote");
-    setLocation("");
-    onDone();
+    setError("");
+    setBusy(true);
+    
+    try {
+      await onAdd({
+        company: company.trim(),
+        position: position.trim(),
+        work_type: workType,
+        location: location.trim(),
+      });
+      setCompany("");
+      setPosition("");
+      setWorkType("Remote");
+      setLocation("");
+      onDone();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to add job";
+      setError(message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -46,17 +53,20 @@ export default function AddJobForm({ onAdd, onDone }: AddJobFormProps) {
           onChange={(e) => setCompany(e.target.value)}
           placeholder="Company *"
           className="input"
+          disabled={busy}
         />
         <input
           value={position}
           onChange={(e) => setPosition(e.target.value)}
           placeholder="Position *"
           className="input"
+          disabled={busy}
         />
         <select
           value={workType}
           onChange={(e) => setWorkType(e.target.value as WorkType)}
           className="input"
+          disabled={busy}
         >
           {WORK_TYPES.map((t) => (
             <option key={t} value={t}>
@@ -69,15 +79,17 @@ export default function AddJobForm({ onAdd, onDone }: AddJobFormProps) {
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Location (city, state…)"
           className="input"
+          disabled={busy}
         />
       </div>
+      {error && <div className="auth-error">{error}</div>}
       <button
         disabled={!canSubmit}
         onClick={handleSubmit}
         className="btn-primary"
-        style={{ opacity: canSubmit ? 1 : 0.4 }}
+        style={{ opacity: canSubmit ? 1 : 0.4, width: "100%" }}
       >
-        Add Application →
+        {busy ? "Adding…" : "Add Application →"}
       </button>
     </div>
   );
